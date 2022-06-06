@@ -70,3 +70,51 @@ func (suite *JobOfferServiceUnitTestsSuite) TestJobOfferService_Add_ValidDataPro
 	assert.Equal(suite.T(), dto.Skills, returnedOffer.Skills)
 	assert.Equal(suite.T(), nil, err)
 }
+
+func (suite *JobOfferServiceUnitTestsSuite) TestJobOfficeService_GetCompanysOffers_NoOffersReturnsEmpty() {
+	suite.offerRepositoryMock.On("GetByCompany", 1).Return([]*model.JobOffer{}, nil).Once()
+
+	offers, err := suite.service.GetCompanysOffers(1)
+
+	assert.Equal(suite.T(), nil, err)
+	assert.Equal(suite.T(), 0, len(offers))
+}
+
+func (suite *JobOfferServiceUnitTestsSuite) TestJobOfficeService_GetAll_NoOffersReturnsEmpty() {
+	suite.offerRepositoryMock.On("GetAll").Return([]*model.JobOffer{}, nil).Once()
+
+	offers, err := suite.service.GetAll()
+
+	assert.Equal(suite.T(), nil, err)
+	assert.Equal(suite.T(), 0, len(offers))
+}
+
+func (suite *JobOfferServiceUnitTestsSuite) TestJobOfficeService_Search_ReturnedOffer() {
+	offer := model.JobOffer{
+		CompanyID:                  1,
+		Skills:                     "skills",
+		JobDescription:             "test",
+		DailyActivitiesDescription: "desc",
+		Position:                   "pos",
+		Link:                       "link",
+		ID:                         1,
+	}
+	var list []*model.JobOffer
+	list = append(list, &offer)
+	param := "test"
+
+	suite.offerRepositoryMock.On("Search", param).Return(list, nil).Once()
+
+	offers, err := suite.service.Search(param)
+
+	assert.Equal(suite.T(), nil, err)
+	assert.Equal(suite.T(), len(list), len(offers))
+	for i := 0; i < len(offers); i++ {
+		assert.Equal(suite.T(), list[i].ID, offers[i].ID)
+		assert.Equal(suite.T(), list[i].CompanyID, offers[i].CompanyID)
+		assert.Equal(suite.T(), list[i].Link, offers[i].Link)
+		assert.Equal(suite.T(), list[i].Skills, offers[i].Skills)
+		assert.Equal(suite.T(), list[i].JobDescription, offers[i].JobDescription)
+		assert.Equal(suite.T(), list[i].DailyActivitiesDescription, offers[i].DailyActivitiesDescription)
+	}
+}
