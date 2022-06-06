@@ -7,7 +7,6 @@ import (
 	"jobs-ms/src/service"
 	"net/http"
 	"strconv"
-
 	"github.com/gin-gonic/gin"
 )
 

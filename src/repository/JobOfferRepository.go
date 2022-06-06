@@ -4,7 +4,7 @@ import (
 	"errors"
 	"jobs-ms/src/model"
 	"strings"
-
+	"jobs-ms/src/model"
 	"github.com/jinzhu/gorm"
 )
 
