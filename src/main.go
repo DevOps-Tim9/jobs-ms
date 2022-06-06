@@ -51,6 +51,9 @@ func initOfferHandler(service *service.JobOfferService) *handler.JobOfferHandler
 
 func handleOfferFunc(handler *handler.JobOfferHandler, router *gin.Engine) {
 	router.POST("/jobOffers", handler.AddJobOffer)
+	router.GET("/jobOffers", handler.GetAll)
+	router.GET("/jobOffers/:companyId", handler.GetJobOffersByCompany)
+	router.GET("/jobOffers/search", handler.Search)
 }
 
 func main() {
