@@ -41,3 +41,19 @@ func (repo *JobOfferRepositoryMock) Search(param string) ([]*model.JobOffer, err
 	}
 	return args.Get(0).([]*model.JobOffer), args.Get(1).(error)
 }
+
+func (repo *JobOfferRepositoryMock) GetById(id int) (*model.JobOffer, error) {
+	args := repo.Called(id)
+	if args.Get(1) == nil {
+		return args.Get(0).(*model.JobOffer), nil
+	}
+	return nil, args.Get(1).(error)
+}
+
+func (repo *JobOfferRepositoryMock) Delete(id int) error {
+	args := repo.Called(id)
+	if args.Get(0) == nil {
+		return nil
+	}
+	return args.Get(0).(error)
+}

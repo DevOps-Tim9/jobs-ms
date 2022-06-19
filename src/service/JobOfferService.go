@@ -16,6 +16,8 @@ type IJobOfferService interface {
 	GetCompanysOffers(int) ([]*dto.JobOfferResponseDTO, error)
 	GetAll() ([]*dto.JobOfferResponseDTO, error)
 	Search(string) ([]*dto.JobOfferResponseDTO, error)
+	GetById(int) (*dto.JobOfferResponseDTO, error)
+	Delete(int) error
 }
 
 func NewJobOfferService(jobOfferRepository repository.IJobOfferRepository) IJobOfferService {
@@ -84,4 +86,25 @@ func (service *JobOfferService) Search(param string) ([]*dto.JobOfferResponseDTO
 	}
 
 	return res, nil
+}
+
+func (service *JobOfferService) GetById(id int) (*dto.JobOfferResponseDTO, error) {
+	offer, err := service.JobOfferRepo.GetById(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	dto := mapper.JobOfferToJobOfferResponseDTO(offer)
+	return dto, nil
+}
+
+func (service *JobOfferService) Delete(id int) error {
+	err := service.JobOfferRepo.Delete(id)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

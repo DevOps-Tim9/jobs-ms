@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+	"fmt"
 	"jobs-ms/src/model"
 	"strings"
 
@@ -13,6 +14,8 @@ type IJobOfferRepository interface {
 	GetByCompany(int) ([]*model.JobOffer, error)
 	GetAll() ([]*model.JobOffer, error)
 	Search(string) ([]*model.JobOffer, error)
+	GetById(int) (*model.JobOffer, error)
+	Delete(int) error
 }
 
 func NewJobOfferRepository(database *gorm.DB) IJobOfferRepository {
@@ -38,6 +41,25 @@ func (repo *JobOfferRepository) GetByCompany(id int) ([]*model.JobOffer, error) 
 	}
 
 	return offers, nil
+}
+
+func (repo *JobOfferRepository) GetById(id int) (*model.JobOffer, error) {
+	offer := model.JobOffer{}
+	if result := repo.Database.Find(&offer, "ID = ?", id); result.Error != nil {
+		return nil, errors.New(fmt.Sprintf("Error happened during retrieving job offer with id: %d", id))
+	}
+
+	return &offer, nil
+}
+
+func (repo *JobOfferRepository) Delete(id int) error {
+	result := repo.Database.Delete(&model.JobOffer{}, id)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
 }
 
 func (repo *JobOfferRepository) GetAll() ([]*model.JobOffer, error) {
