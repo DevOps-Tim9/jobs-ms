@@ -78,5 +78,8 @@ func main() {
 
 	handleOfferFunc(offerHandler, router)
 
-	http.ListenAndServe(port, cors.AllowAll().Handler(router))
+	http.ListenAndServe(port, cors.New(cors.Options{
+		AllowedOrigins: []string{"http://localhost:9094"},
+		AllowedMethods: []string{http.MethodGet, http.MethodPost, http.MethodDelete, http.MethodPut},
+	}).Handler(router))
 }
