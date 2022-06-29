@@ -71,6 +71,47 @@ func (suite *JobOfferServiceUnitTestsSuite) TestJobOfferService_Add_ValidDataPro
 	assert.Equal(suite.T(), nil, err)
 }
 
+func (suite *JobOfferServiceUnitTestsSuite) TestJobOfficeService_GetById_GetsJobOffer() {
+	id := 1
+	description := "Description test"
+	companyId := 1
+	position := "position test"
+	skills := "test skills"
+	link := "test link"
+	activities := "activities test"
+
+	offer := model.JobOffer{
+		ID:                         id,
+		JobDescription:             description,
+		CompanyID:                  companyId,
+		Position:                   position,
+		Skills:                     skills,
+		Link:                       link,
+		DailyActivitiesDescription: activities,
+	}
+
+	suite.offerRepositoryMock.On("GetById", 1).Return(&offer, nil).Once()
+
+	dto, err := suite.service.GetById(1)
+
+	assert.Equal(suite.T(), nil, err)
+	assert.Equal(suite.T(), description, dto.JobDescription)
+	assert.Equal(suite.T(), skills, dto.Skills)
+	assert.Equal(suite.T(), position, dto.Position)
+	assert.Equal(suite.T(), activities, dto.DailyActivitiesDescription)
+	assert.Equal(suite.T(), link, dto.Link)
+	assert.Equal(suite.T(), companyId, dto.CompanyID)
+}
+
+func (suite *JobOfferServiceUnitTestsSuite) TestJobOfficeService_Delete_Pass() {
+	id := 1
+	suite.offerRepositoryMock.On("Delete", id).Return(nil).Once()
+
+	err := suite.service.Delete(id)
+
+	assert.Equal(suite.T(), nil, err)
+}
+
 func (suite *JobOfferServiceUnitTestsSuite) TestJobOfficeService_GetCompanysOffers_NoOffersReturnsEmpty() {
 	suite.offerRepositoryMock.On("GetByCompany", 1).Return([]*model.JobOffer{}, nil).Once()
 
@@ -79,7 +120,6 @@ func (suite *JobOfferServiceUnitTestsSuite) TestJobOfficeService_GetCompanysOffe
 	assert.Equal(suite.T(), nil, err)
 	assert.Equal(suite.T(), 0, len(offers))
 }
-
 func (suite *JobOfferServiceUnitTestsSuite) TestJobOfficeService_GetAll_NoOffersReturnsEmpty() {
 	suite.offerRepositoryMock.On("GetAll").Return([]*model.JobOffer{}, nil).Once()
 

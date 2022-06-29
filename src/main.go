@@ -52,8 +52,10 @@ func initOfferHandler(service *service.JobOfferService) *handler.JobOfferHandler
 func handleOfferFunc(handler *handler.JobOfferHandler, router *gin.Engine) {
 	router.POST("/jobOffers", handler.AddJobOffer)
 	router.GET("/jobOffers", handler.GetAll)
-	router.GET("/jobOffers/:companyId", handler.GetJobOffersByCompany)
+	router.GET("/jobOffers/company/:companyId", handler.GetJobOffersByCompany)
 	router.GET("/jobOffers/search", handler.Search)
+	router.GET("/jobOffers/:id", handler.GetJobOffer)
+	router.DELETE("/jobOffers/:id", handler.DeleteJobOffer)
 }
 
 func main() {
@@ -76,5 +78,8 @@ func main() {
 
 	handleOfferFunc(offerHandler, router)
 
-	http.ListenAndServe(port, cors.AllowAll().Handler(router))
+	http.ListenAndServe(port, cors.New(cors.Options{
+		AllowedOrigins: []string{"http://localhost:9094"},
+		AllowedMethods: []string{http.MethodGet, http.MethodPost, http.MethodDelete, http.MethodPut},
+	}).Handler(router))
 }

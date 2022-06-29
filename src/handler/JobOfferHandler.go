@@ -7,6 +7,7 @@ import (
 	"jobs-ms/src/service"
 	"net/http"
 	"strconv"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -66,6 +67,38 @@ func (handler *JobOfferHandler) Search(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, offersDTO)
+}
+
+func (handler *JobOfferHandler) GetJobOffer(ctx *gin.Context) {
+	id, idErr := getId(ctx.Param("id"))
+	if idErr != nil {
+		ctx.JSON(http.StatusBadRequest, idErr.Error())
+		return
+	}
+
+	offersDTO, err := handler.Service.GetById(id)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	ctx.JSON(http.StatusOK, offersDTO)
+}
+
+func (handler *JobOfferHandler) DeleteJobOffer(ctx *gin.Context) {
+	id, idErr := getId(ctx.Param("id"))
+	if idErr != nil {
+		ctx.JSON(http.StatusBadRequest, idErr.Error())
+		return
+	}
+
+	err := handler.Service.Delete(id)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ctx.JSON(http.StatusNoContent, nil)
 }
 
 func getId(idParam string) (int, error) {
