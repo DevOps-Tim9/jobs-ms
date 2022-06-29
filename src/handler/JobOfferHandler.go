@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/opentracing/opentracing-go"
 )
 
 type JobOfferHandler struct {
@@ -16,6 +17,9 @@ type JobOfferHandler struct {
 }
 
 func (handler *JobOfferHandler) AddJobOffer(ctx *gin.Context) {
+	span, _ := opentracing.StartSpanFromContext(ctx.Request.Context(), "POST /jobOffers")
+	defer span.Finish()
+
 	var jobOfferDTO dto.JobOfferRequestDTO
 	if err := ctx.ShouldBindJSON(&jobOfferDTO); err != nil {
 		ctx.JSON(http.StatusBadRequest, err)
@@ -33,6 +37,9 @@ func (handler *JobOfferHandler) AddJobOffer(ctx *gin.Context) {
 }
 
 func (handler *JobOfferHandler) GetJobOffersByCompany(ctx *gin.Context) {
+	span, _ := opentracing.StartSpanFromContext(ctx.Request.Context(), "GET /jobOffers/company/:companyId")
+	defer span.Finish()
+
 	id, idErr := getId(ctx.Param("companyId"))
 	if idErr != nil {
 		ctx.JSON(http.StatusBadRequest, idErr.Error())
@@ -49,6 +56,9 @@ func (handler *JobOfferHandler) GetJobOffersByCompany(ctx *gin.Context) {
 }
 
 func (handler *JobOfferHandler) GetAll(ctx *gin.Context) {
+	span, _ := opentracing.StartSpanFromContext(ctx.Request.Context(), "GET /jobOffers")
+	defer span.Finish()
+
 	offersDTO, err := handler.Service.GetAll()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err.Error())
@@ -59,6 +69,9 @@ func (handler *JobOfferHandler) GetAll(ctx *gin.Context) {
 }
 
 func (handler *JobOfferHandler) Search(ctx *gin.Context) {
+	span, _ := opentracing.StartSpanFromContext(ctx.Request.Context(), "GET /jobOffers/search")
+	defer span.Finish()
+
 	param := ctx.Query("param")
 	offersDTO, err := handler.Service.Search(param)
 	if err != nil {
@@ -70,6 +83,9 @@ func (handler *JobOfferHandler) Search(ctx *gin.Context) {
 }
 
 func (handler *JobOfferHandler) GetJobOffer(ctx *gin.Context) {
+	span, _ := opentracing.StartSpanFromContext(ctx.Request.Context(), "GET /jobOffers/:id")
+	defer span.Finish()
+
 	id, idErr := getId(ctx.Param("id"))
 	if idErr != nil {
 		ctx.JSON(http.StatusBadRequest, idErr.Error())
@@ -86,6 +102,9 @@ func (handler *JobOfferHandler) GetJobOffer(ctx *gin.Context) {
 }
 
 func (handler *JobOfferHandler) DeleteJobOffer(ctx *gin.Context) {
+	span, _ := opentracing.StartSpanFromContext(ctx.Request.Context(), "DELETE /jobOffers/:id")
+	defer span.Finish()
+
 	id, idErr := getId(ctx.Param("id"))
 	if idErr != nil {
 		ctx.JSON(http.StatusBadRequest, idErr.Error())
