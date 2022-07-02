@@ -7,6 +7,7 @@ import (
 	"jobs-ms/src/model"
 	"jobs-ms/src/repository"
 	"jobs-ms/src/service"
+	"jobs-ms/src/utils"
 	"net/http"
 	"os"
 	"strconv"
@@ -74,11 +75,11 @@ func initOfferRepo(database *gorm.DB) *repository.JobOfferRepository {
 }
 
 func initOfferService(repo *repository.JobOfferRepository) *service.JobOfferService {
-	return &service.JobOfferService{JobOfferRepo: repo}
+	return &service.JobOfferService{JobOfferRepo: repo, Logger: utils.Logger()}
 }
 
 func initOfferHandler(service *service.JobOfferService) *handler.JobOfferHandler {
-	return &handler.JobOfferHandler{Service: service}
+	return &handler.JobOfferHandler{Service: service, Logger: utils.Logger()}
 }
 
 func handleOfferFunc(handler *handler.JobOfferHandler, router *gin.Engine) {
@@ -179,12 +180,18 @@ func prometheusGin() gin.HandlerFunc {
 }
 
 func main() {
+	logger := utils.Logger()
+
+	logger.Info("Connecting with DB")
+
 	database, _ := initDB()
 
 	port := fmt.Sprintf(":%s", os.Getenv("SERVER_PORT"))
 
+	logger.Info("Initializing Jaeger")
 	tracer, trCloser, err := InitJaeger()
 	if err != nil {
+		logger.Debug(err.Error())
 		fmt.Printf("error init jaeger %v", err)
 	} else {
 		defer trCloser.Close()
@@ -205,6 +212,7 @@ func main() {
 
 	handleOfferFunc(offerHandler, router)
 
+	logger.Info(fmt.Sprintf("Starting server on port %s", os.Getenv("SERVER_PORT")))
 	http.ListenAndServe(port, cors.New(cors.Options{
 		AllowedOrigins: []string{"http://localhost:9094"},
 		AllowedMethods: []string{http.MethodGet, http.MethodPost, http.MethodDelete, http.MethodPut},

@@ -4,6 +4,7 @@ import (
 	"jobs-ms/src/dto"
 	"jobs-ms/src/model"
 	"jobs-ms/src/repository"
+	"jobs-ms/src/utils"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -22,7 +23,7 @@ func TestJobOfferServiceUnitTestsSuite(t *testing.T) {
 
 func (suite *JobOfferServiceUnitTestsSuite) SetupSuite() {
 	suite.offerRepositoryMock = new(repository.JobOfferRepositoryMock)
-	suite.service = NewJobOfferService(suite.offerRepositoryMock)
+	suite.service = NewJobOfferService(suite.offerRepositoryMock, utils.Logger())
 }
 
 func (suite *JobOfferServiceUnitTestsSuite) TestNewJobOfferService() {
