@@ -10,10 +10,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/opentracing/opentracing-go"
+	"github.com/sirupsen/logrus"
 )
 
 type JobOfferHandler struct {
 	Service *service.JobOfferService
+	Logger  *logrus.Entry
 }
 
 func (handler *JobOfferHandler) AddJobOffer(ctx *gin.Context) {
@@ -22,13 +24,16 @@ func (handler *JobOfferHandler) AddJobOffer(ctx *gin.Context) {
 
 	var jobOfferDTO dto.JobOfferRequestDTO
 	if err := ctx.ShouldBindJSON(&jobOfferDTO); err != nil {
+		handler.Logger.Debug(err.Error())
 		ctx.JSON(http.StatusBadRequest, err)
 		return
 	}
 
+	handler.Logger.Info(fmt.Sprintf("Adding new job offer for company %d", jobOfferDTO.CompanyID))
+
 	dto, err := handler.Service.Add(&jobOfferDTO)
 	if err != nil {
-		fmt.Println(err)
+		handler.Logger.Debug(err.Error())
 		ctx.JSON(http.StatusBadRequest, err)
 		return
 	}
@@ -42,12 +47,14 @@ func (handler *JobOfferHandler) GetJobOffersByCompany(ctx *gin.Context) {
 
 	id, idErr := getId(ctx.Param("companyId"))
 	if idErr != nil {
+		handler.Logger.Debug(idErr.Error())
 		ctx.JSON(http.StatusBadRequest, idErr.Error())
 		return
 	}
-
+	handler.Logger.Info(fmt.Sprintf("Getting job offers for company %d", id))
 	offersDTO, err := handler.Service.GetCompanysOffers(id)
 	if err != nil {
+		handler.Logger.Debug(err.Error())
 		ctx.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -59,8 +66,11 @@ func (handler *JobOfferHandler) GetAll(ctx *gin.Context) {
 	span, _ := opentracing.StartSpanFromContext(ctx.Request.Context(), "GET /jobOffers")
 	defer span.Finish()
 
+	handler.Logger.Info("Getting job offers")
+
 	offersDTO, err := handler.Service.GetAll()
 	if err != nil {
+		handler.Logger.Debug(err.Error())
 		ctx.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -72,9 +82,12 @@ func (handler *JobOfferHandler) Search(ctx *gin.Context) {
 	span, _ := opentracing.StartSpanFromContext(ctx.Request.Context(), "GET /jobOffers/search")
 	defer span.Finish()
 
+	handler.Logger.Info("Searching job offers")
+
 	param := ctx.Query("param")
 	offersDTO, err := handler.Service.Search(param)
 	if err != nil {
+		handler.Logger.Debug(err.Error())
 		ctx.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -88,12 +101,16 @@ func (handler *JobOfferHandler) GetJobOffer(ctx *gin.Context) {
 
 	id, idErr := getId(ctx.Param("id"))
 	if idErr != nil {
+		handler.Logger.Debug(idErr.Error())
 		ctx.JSON(http.StatusBadRequest, idErr.Error())
 		return
 	}
 
+	handler.Logger.Info(fmt.Sprintf("Getting job offer with id %d", id))
+
 	offersDTO, err := handler.Service.GetById(id)
 	if err != nil {
+		handler.Logger.Debug(err.Error())
 		ctx.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -107,12 +124,16 @@ func (handler *JobOfferHandler) DeleteJobOffer(ctx *gin.Context) {
 
 	id, idErr := getId(ctx.Param("id"))
 	if idErr != nil {
+		handler.Logger.Debug(idErr.Error())
 		ctx.JSON(http.StatusBadRequest, idErr.Error())
 		return
 	}
 
+	handler.Logger.Info(fmt.Sprintf("Deleting job offer with id %d", id))
+
 	err := handler.Service.Delete(id)
 	if err != nil {
+		handler.Logger.Debug(err.Error())
 		ctx.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
