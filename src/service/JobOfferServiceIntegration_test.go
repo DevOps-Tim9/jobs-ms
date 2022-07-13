@@ -73,8 +73,8 @@ func (suite *JobOfferServiceIntegrationTestSuite) SetupSuite() {
 
 	tx := suite.db.Begin()
 
-	tx.Create(&suite.offers[0])
 	tx.Create(&suite.offers[1])
+	tx.Create(&suite.offers[0])
 
 	tx.Commit()
 }
