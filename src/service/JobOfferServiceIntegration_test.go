@@ -162,14 +162,6 @@ func (suite *JobOfferServiceIntegrationTestSuite) TestIntegrationJobOfferService
 	assert.Equal(suite.T(), 2, len(offers))
 }
 
-func (suite *JobOfferServiceIntegrationTestSuite) TestIntegrationJobOfferService_Delete_JobOfferExists() {
-	id := 2
-
-	err := suite.service.Delete(id)
-
-	assert.Nil(suite.T(), err)
-}
-
 func (suite *JobOfferServiceIntegrationTestSuite) TestIntegrationJobOfferService_Add_Pass() {
 	offerDto := dto.JobOfferRequestDTO{
 		CompanyID:                  1000,
