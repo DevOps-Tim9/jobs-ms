@@ -52,7 +52,6 @@ func (suite *JobOfferServiceIntegrationTestSuite) SetupSuite() {
 
 	suite.offers = []model.JobOffer{
 		{
-			ID:                         1,
 			CompanyID:                  1000,
 			Position:                   "QA",
 			JobDescription:             "test",
@@ -61,7 +60,6 @@ func (suite *JobOfferServiceIntegrationTestSuite) SetupSuite() {
 			Link:                       "test link",
 		},
 		{
-			ID:                         2,
 			CompanyID:                  2000,
 			Position:                   "QA",
 			JobDescription:             "test",
@@ -73,8 +71,8 @@ func (suite *JobOfferServiceIntegrationTestSuite) SetupSuite() {
 
 	tx := suite.db.Begin()
 
-	tx.Create(&suite.offers[1])
 	tx.Create(&suite.offers[0])
+	tx.Create(&suite.offers[1])
 
 	tx.Commit()
 }
