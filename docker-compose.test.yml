@@ -9,9 +9,9 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin
-      POSTGRES_DB: JobOffers-test
+      POSTGRES_DB: JobOffers-tests
     healthcheck:
-      test: pg_isready -U postgres -d JobOffers-test
+      test: pg_isready -U postgres -d JobOffers-tests
       interval: 5s
       timeout: 5s
       retries: 3
@@ -30,14 +30,9 @@ services:
       DATABASE_USERNAME: postgres
       DATABASE_PASSWORD: admin
       DATABASE_DOMAIN: jobs-database-test
-      DATABASE_SCHEMA: JobOffers-test
+      DATABASE_SCHEMA: JobOffers-tests
       DATABASE_PORT: 5432
-      SERVER_PORT: 9093
-      AMQP_SERVER_URL: amqp://guest:guest@rabbitmq:5673/
-      AUTH0_DOMAIN: ten-test.eu.auth0.com
-      AUTH0_CLIENT_ID: VEoiS6gjRN5S5wdm4qKqgphWh5rHp420
-      AUTH0_CLIENT_SECRET: 6hJj_WWJwHQ8bQEua_cTEOk1p6_k4SQBeqfQBGCjGWfvExsaQYjweF-OHqARfKZL
-      AUTH0_AUDIENCE: https://ten-test.eu.auth0.com/api/v2/
+      SERVER_PORT: 9099
     ports:
       - "9099:9099"
     depends_on:
