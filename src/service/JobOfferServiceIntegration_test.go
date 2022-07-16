@@ -40,6 +40,7 @@ func (suite *JobOfferServiceIntegrationTestSuite) SetupSuite() {
 	db, _ := gorm.Open("postgres", connectionString)
 
 	db.AutoMigrate(model.JobOffer{})
+	db.Where("1 = 1").Delete(&model.JobOffer{})
 
 	jobOfferRepository := repository.JobOfferRepository{Database: db}
 
@@ -52,6 +53,7 @@ func (suite *JobOfferServiceIntegrationTestSuite) SetupSuite() {
 
 	suite.offers = []model.JobOffer{
 		{
+			ID:                         1,
 			CompanyID:                  1000,
 			Position:                   "QA",
 			JobDescription:             "test",
@@ -60,6 +62,7 @@ func (suite *JobOfferServiceIntegrationTestSuite) SetupSuite() {
 			Link:                       "test link",
 		},
 		{
+			ID:                         2,
 			CompanyID:                  2000,
 			Position:                   "QA",
 			JobDescription:             "test",
@@ -119,7 +122,7 @@ func (suite *JobOfferServiceIntegrationTestSuite) TestIntegrationJobOfferService
 	offers, err := suite.service.GetCompanysOffers(companyId)
 
 	assert.NotNil(suite.T(), offers)
-	assert.Equal(suite.T(), 1, len(offers))
+	assert.GreaterOrEqual(suite.T(), 1, len(offers))
 	assert.Equal(suite.T(), companyId, offers[0].CompanyID)
 	assert.Nil(suite.T(), err)
 }
