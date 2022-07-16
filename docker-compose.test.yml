@@ -33,6 +33,7 @@ services:
       DATABASE_SCHEMA: JobOffers-tests
       DATABASE_PORT: 5432
       SERVER_PORT: 9099
+      EVENTS_MS: http://localhost:9081/events
     ports:
       - "9099:9099"
     depends_on:
