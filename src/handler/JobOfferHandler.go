@@ -1,12 +1,16 @@
 package handler
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"jobs-ms/src/dto"
 	"jobs-ms/src/service"
 	"net/http"
+	"os"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/opentracing/opentracing-go"
@@ -32,6 +36,9 @@ func (handler *JobOfferHandler) AddJobOffer(ctx *gin.Context) {
 	handler.Logger.Info(fmt.Sprintf("Adding new job offer for company %d", jobOfferDTO.CompanyID))
 
 	dto, err := handler.Service.Add(&jobOfferDTO)
+
+	handler.AddSystemEvent(time.Now().Format("2006-01-02 15:04:05"), fmt.Sprintf("New job offer created with id %d", dto.ID))
+
 	if err != nil {
 		handler.Logger.Debug(err.Error())
 		ctx.JSON(http.StatusBadRequest, err)
@@ -138,6 +145,8 @@ func (handler *JobOfferHandler) DeleteJobOffer(ctx *gin.Context) {
 		return
 	}
 
+	handler.AddSystemEvent(time.Now().Format("2006-01-02 15:04:05"), fmt.Sprintf("Job offer deleted with id %d", id))
+
 	ctx.JSON(http.StatusNoContent, nil)
 }
 
@@ -147,4 +156,25 @@ func getId(idParam string) (int, error) {
 		return 0, errors.New("Company id should be a number")
 	}
 	return int(id), nil
+}
+
+func (handler *JobOfferHandler) AddSystemEvent(time string, message string) error {
+	event := dto.EventRequestDTO{
+		Timestamp: time,
+		Message:   message,
+	}
+
+	b, _ := json.Marshal(&event)
+	endpoint := os.Getenv("EVENTS_MS")
+	handler.Logger.Info("Sending system event to events-ms")
+	req, _ := http.NewRequest("POST", endpoint, bytes.NewBuffer(b))
+	req.Header.Set("content-type", "application/json")
+
+	_, err := http.DefaultClient.Do(req)
+	if err != nil {
+		handler.Logger.Debug("Error happened during sending system event")
+		return err
+	}
+
+	return nil
 }
